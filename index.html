@@ -6,6 +6,8 @@
   <title>URL Encoder/Decoder</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <!-- Vue.js 3 CDN -->
   <script src="https://unpkg.com/vue@3"></script>
 </head>
@@ -21,18 +23,24 @@
     </label>
   </div>
 
-  <div class="mb-3">
+  <div class="mb-3 position-relative">
     <label for="inputText" class="form-label">{{ isEncodeMode ? 'Text to Encode' : 'Text to Decode' }}</label>
     <textarea id="inputText" v-model="inputText" class="form-control" rows="4" placeholder="Enter your text here..."></textarea>
+    <button class="btn btn-light position-absolute top-0 end-0 m-1" @click="copyToClipboard(inputText, 'input')" data-bs-toggle="tooltip" title="Copy to clipboard" ref="inputCopyButton">
+      <i class="bi bi-clipboard"></i>
+    </button>
   </div>
 
   <button @click="processText" class="btn btn-primary w-100 mb-3">
     {{ isEncodeMode ? 'Encode' : 'Decode' }}
   </button>
 
-  <div v-if="outputText" class="alert alert-secondary">
-    <strong>Output:</strong>
-    <pre>{{ outputText }}</pre>
+  <div v-if="outputText" class="mb-3 position-relative">
+    <label class="form-label">Output:</label>
+    <pre class="border p-2">{{ outputText }}</pre>
+    <button class="btn btn-light position-absolute top-0 end-0 m-1" @click="copyToClipboard(outputText, 'output')" data-bs-toggle="tooltip" title="Copy to clipboard" ref="outputCopyButton">
+      <i class="bi bi-clipboard"></i>
+    </button>
   </div>
 </div>
 
@@ -68,7 +76,30 @@ createApp({
       } catch (e) {
         return 'Invalid URL encoding!';
       }
+    },
+    copyToClipboard(text, type) {
+      // Copy text to clipboard
+      navigator.clipboard.writeText(text).then(() => {
+        // Show tooltip
+        const tooltipButton = type === 'input' ? this.$refs.inputCopyButton : this.$refs.outputCopyButton;
+        const tooltip = new bootstrap.Tooltip(tooltipButton);
+        tooltip.show();
+
+        // Hide tooltip after a brief delay
+        setTimeout(() => {
+          tooltip.hide();
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+      });
     }
+  },
+  mounted() {
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
   }
 }).mount('#app');
 </script>
