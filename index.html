@@ -80,26 +80,32 @@ createApp({
     copyToClipboard(text, type) {
       // Copy text to clipboard
       navigator.clipboard.writeText(text).then(() => {
-        // Show tooltip
         const tooltipButton = type === 'input' ? this.$refs.inputCopyButton : this.$refs.outputCopyButton;
+        
+        // Show tooltip
         const tooltip = new bootstrap.Tooltip(tooltipButton);
+        tooltipButton.setAttribute('data-bs-original-title', 'Copied!'); // Set tooltip text
         tooltip.show();
 
-        // Hide tooltip after a brief delay
+        // Reset tooltip text after a delay
         setTimeout(() => {
           tooltip.hide();
+          tooltipButton.setAttribute('data-bs-original-title', 'Copy to clipboard'); // Reset tooltip text
         }, 2000);
       }).catch(err => {
         console.error('Failed to copy: ', err);
       });
+    },
+    initTooltips() {
+      // Initialize Bootstrap tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
     }
   },
   mounted() {
-    // Initialize Bootstrap tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    this.initTooltips();
   }
 }).mount('#app');
 </script>
