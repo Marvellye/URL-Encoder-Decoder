@@ -54,11 +54,19 @@ createApp({
         this.outputText = encodeURIComponent(this.inputText);
       } else {
         // Decode the URL component
-        try {
-          this.outputText = decodeURIComponent(this.inputText);
-        } catch (e) {
-          this.outputText = 'Invalid URL encoding!';
+        this.outputText = this.decodeURL(this.inputText);
+      }
+    },
+    decodeURL(encodedUrl) {
+      try {
+        let decoded = decodeURIComponent(encodedUrl);
+        // Keep decoding until no more encoded characters are found
+        while (decoded.includes('%')) {
+          decoded = decodeURIComponent(decoded);
         }
+        return decoded.replace(/\\/g, ''); // Remove backslashes
+      } catch (e) {
+        return 'Invalid URL encoding!';
       }
     }
   }
